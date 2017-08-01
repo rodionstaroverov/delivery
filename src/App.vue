@@ -11,23 +11,37 @@
     <header v-if="user.status">
       <div class="logo"></div>
       <div class="current-user">Вы зашли как: {{ user.name }}</div>
-      <div class="total-order"><a href="#">Посмореть общий заказ</a></div>
+      <div id="orders">
+        <a href="#">Посмореть общий заказ </a>
+        <a href="#" @click="order = !order" v-if="order">Вернутсья</a>
+      </div>
     </header>
 
-    <div class="main-content">
+    <div class="main-content" v-if="!order">
       <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:style="{ 'background-image': 'url(' + product.img + ')'}" v-on:click="toggleActive(product)">
         <div class="product-success" @click="$event.target.classList.toggle('product-success-active')"></div>
         <div class="product-description">
           <h4>{{ product.name }}</h4>
-          <!--<p class="description">{{ product.description }}</p>-->
         </div>
         <div class="product-price">{{ product.price | currency}}</div>
       </div>
       <div class="total-order">
-        <p>Общая сумма заказа: {{  total() | currency }}</p>
+        <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
+        <span>Общая сумма заказа: {{  total() | currency }}</span>
+        <div class="submit" @click="order = !order; ">Далее</div>
       </div>
 
     </div>
+
+    <div class="order-table" v-if="order">
+      <p>Ваш заказ принят</p>
+      <ul>
+        <li v-if="a.active" v-for="a in items"><div>{{ a.name }}</div> <div>{{ a.price | currency }}</div></li>
+        <hr>
+        <li><div>Общая сумма: </div><div>{{ total() | currency }}</div></li>
+      </ul>
+    </div>
+
   </div>
 </template>
 
@@ -52,6 +66,7 @@ export default {
   },
   data () {
     return {
+        order: false,
         user:
             {
                 name: "",
@@ -128,8 +143,12 @@ export default {
 </script>
 
 <style lang="scss">
+  $color-white: #fffafa;
+  $color-green: #1db590;
+  $color-light-green: #75e0d3;
+
   body {
-    background-color: #fffafa;
+    background-color: $color-white;
     margin: 0;
     padding: 0;
   }
@@ -139,20 +158,25 @@ export default {
 
   }
 
+  ::SELECTION {
+    background-color: #333;
+    color: $color-white;
+  }
+
   #user-name {
     width: 100%;
     height: 100%;
     display: block;
     position: absolute;
     z-index: 100;
-    background-color: #fffafa;
+    background-color: $color-white;
     font-size: 28px;
     input {
       height: 40px;
       width: 99vw;
       text-align: center;
       font-size: 28px;
-      background-color: #fffafa;
+      background-color: $color-white;
       border: none;
       margin-left: 7px;
     }
@@ -167,18 +191,18 @@ export default {
   }
 
   .user-name-submit {
-    background-color: #75e0d3;
+    background-color: $color-light-green;
     width: 120px;
     height: 40px;
     display: block;
     margin: 30px auto;
-    color: #fffafa;
+    color: $color-white;
     font-size: 20px;
     text-align: center;
     line-height: 1.9;
     cursor: pointer;
     &:hover {
-      background-color: #1db590;
+      background-color: $color-green;
     }
   }
 
@@ -199,8 +223,8 @@ export default {
       font-size: 20px;
       line-height: 4.7;
     }
-    .total-order {
-      width: 250px;
+    #orders {
+      margin-right: 7px;
       height: 50px;
       font-size: 20px;
       line-height: 4.7;
@@ -231,7 +255,7 @@ export default {
         margin-top: 30px;
       }
       .product-success {
-        background-color: #1db590;
+        background-color: $color-green;
         opacity: .3;
         position: relative;
         width: 100%;
@@ -262,7 +286,7 @@ export default {
       }
       .product-description {
         color: #333;
-        background: #fffafa;
+        background: $color-white;
         width: 140px;
         font-size: 24px;
       }
@@ -271,13 +295,53 @@ export default {
         color: #333;
         width: 50px;
         font-size: 18px;
-        background: #fffafa;
+        background: $color-white;
       }
     }
     .total-order {
-      float: right;
-      margin-right: 5px;
       font-size: 26px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin: 30px 5px;
+      div {
+        width: 250px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        background-color: $color-green;
+        color: $color-white;
+        cursor: pointer;
+        line-height: 1.7;
+        user-select: none;
+        margin-right: 10px;
+        &:hover {
+          background-color: darken($color-green, 10%);
+        }
+      }
+      span {
+        margin-right: 12px;
+      }
     }
+  }
+  .order-table {
+    width: 1170px;
+    margin: 0 auto;
+    font-size: 22px;
+    p {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    ul {
+      margin: 0 auto;
+      width: 480px;
+      li {
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        width: 480px;
+      }
+    }
+
   }
 </style>
