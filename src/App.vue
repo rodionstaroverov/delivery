@@ -13,32 +13,38 @@
       <div class="current-user">Вы зашли как: {{ user.name }}</div>
       <div id="orders">
         <a href="#">Посмореть общий заказ </a>
-        <a href="#" @click="order = !order" v-if="order">Вернутсья</a>
       </div>
     </header>
 
-    <div class="main-content" v-if="!order">
-      <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:style="{ 'background-image': 'url(' + product.img + ')'}" v-on:click="toggleActive(product)">
-        <div class="product-success" @click="$event.target.classList.toggle('product-success-active')"></div>
+    <div class="main-content" v-if="!order && user.status">
+      <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:class="{ 'product-active': product.active }">
+          <img v-bind:src="product.img" class="product-image" />
         <div class="product-description">
           <h4>{{ product.name }}</h4>
         </div>
         <div class="product-price">{{ product.price | currency}}</div>
+          <div class="success-btn" v-on:click="addActive(product)">Заказать</div>
       </div>
       <div class="total-order">
         <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
-        <span>Общая сумма заказа: {{  total() | currency }}</span>
-        <div class="submit" @click="order = !order; ">Далее</div>
+
+          <div class="submit decline" @click="">Отменить</div>
+          <span>Общая сумма заказа: {{  total() | currency }}</span>
+          <div class="submit" @click="order = !order">Далее</div>
       </div>
 
     </div>
 
     <div class="order-table" v-if="order">
-      <p>Ваш заказ принят</p>
+      <p>Подтвердите заказ</p>
       <ul>
         <li v-if="a.active" v-for="a in items"><div>{{ a.name }}</div> <div>{{ a.price | currency }}</div></li>
         <hr>
         <li><div>Общая сумма: </div><div>{{ total() | currency }}</div></li>
+          <div class="order-btn">
+            <div class="submit" @click="order = !order" v-if="order">Вернутсья</div>
+            <div class="submit" @click="removeActive()" v-if="order">Все верно</div>
+          </div>
       </ul>
     </div>
 
@@ -49,8 +55,15 @@
 export default {
   name: 'app',
   methods: {
-      toggleActive: function(s){
-          s.active = !s.active;
+      addActive: function (s) {
+          s.active = true;
+      },
+      removeActive: function () {
+          product.active = false;
+      },
+      increaseProductQty: function(s){
+//          var price = s.price;
+//          console.log(price += 1);
       },
       total: function(){
 
@@ -143,9 +156,10 @@ export default {
 </script>
 
 <style lang="scss">
-  $color-white: #fffafa;
+  $color-white: #f5f0f0;
   $color-green: #1db590;
   $color-light-green: #75e0d3;
+  $color-red: #d73d59;
 
   body {
     background-color: $color-white;
@@ -215,7 +229,7 @@ export default {
     /*background-color: #75e0d3;*/
     .logo {
       margin: 10px 0 0 10px;
-      width: 250px;
+      width: 160px;
       height: 80px;
       background: url(assets/logo.svg) no-repeat;
     }
@@ -241,59 +255,56 @@ export default {
   .main-content {
     width: 1170px;
     margin: 0 auto;
+      .product-active {
+          box-shadow: 0 0 10px #3cb371;
+      }
     .product {
-      height: 220px;
-      margin: 5px;
-      width: 380px;
-      display: block;
-      float: left;
-      cursor: pointer;
-      background: rgba(0, 0, 0, .8);
-      background-position: center center;
-      background-size: 100%;
+        height: 400px;
+        width: 224px;
+        margin: 5px;
+        display: block;
+        float: left;
+        background: $color-white;
+        border: 1px solid #e1dcdc;
+        box-sizing: border-box;
+        user-select: none;
+        &:hover {
+            color: #fff;
+        }
+        img {
+            width: 100%;
+            height: 165px;
+            display: block;
+        }
       h4 {
         margin-top: 30px;
+          height: 60px;
+          line-height: 2.5;
+          text-align: center;
       }
-      .product-success {
-        background-color: $color-green;
-        opacity: .3;
-        position: relative;
-        width: 100%;
-        height: 100%;
-        margin-bottom: -220px;
-        visibility: hidden;
-      }
-      .product-success-active {
-        visibility: visible;
-      }
-      &:hover {
-        h4, div {
-          opacity: 1;
-          visibility: visible;
-          color: #333;
+        .success-btn {
+            width: 90%;
+            margin: 40px auto;
+            height: 35px;
+            background-color: $color-green;
+            color: $color-white;
+            text-align: center;
+            line-height: 1.8;
+            font-size: 18px;
+            cursor: pointer;
+            &:hover {
+                background-color: darken($color-green, 10%);
+                color: $color-white;
+            }
         }
-        .product-success {
-          opacity: .3;
-        }
-        .product-success-active {
-          transition: background-color .3s;
-          opacity: .3;
-          background-color: #b53356;
-        }
-      }
-      h4 {
-        text-align: center;
-      }
       .product-description {
         color: #333;
-        background: $color-white;
-        width: 140px;
+        background: #f0ebeb;
         font-size: 24px;
       }
       .product-price {
         text-align: center;
         color: #333;
-        width: 50px;
         font-size: 18px;
         background: $color-white;
       }
@@ -304,23 +315,29 @@ export default {
       justify-content: space-between;
       width: 100%;
       margin: 30px 5px;
-      div {
-        width: 250px;
+      .submit {
+        width: 224px;
         height: 50px;
         display: flex;
         justify-content: center;
         background-color: $color-green;
         color: $color-white;
         cursor: pointer;
-        line-height: 1.7;
+        line-height: 1.8;
         user-select: none;
-        margin-right: 10px;
+        margin: 5px 10px 0 0;
         &:hover {
           background-color: darken($color-green, 10%);
         }
+        &.decline {
+            background-color: $color-red;
+            &:hover {
+                background-color: darken($color-red, 10%);
+            }
+        }
       }
       span {
-        margin-right: 12px;
+          line-height: 2.1;
       }
     }
   }
@@ -328,6 +345,26 @@ export default {
     width: 1170px;
     margin: 0 auto;
     font-size: 22px;
+      .order-btn {
+          display: flex;
+          justify-content: space-between;
+          .submit {
+              width: 150px;
+              height: 40px;
+              display: flex;
+              justify-content: center;
+              background-color: $color-green;
+              color: $color-white;
+              cursor: pointer;
+              line-height: 1.7;
+              user-select: none;
+              margin-top: 30px;
+              &:hover {
+                  background-color: darken($color-green, 10%);
+              }
+          }
+      }
+
     p {
       text-align: center;
       margin-bottom: 50px;
