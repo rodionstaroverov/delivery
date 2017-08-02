@@ -127,7 +127,7 @@ export default {
                 count: 0
             },
             {
-                name: "Лимонад",
+                name: "Роллы",
                 price: 50,
                 id: "q14",
                 img: "/src/assets/item-5.jpg",
@@ -135,10 +135,18 @@ export default {
                 count: 0
             },
             {
-                name: "Чай",
+                name: "Кофе",
                 price: 20,
                 id: "q15",
                 img: "/src/assets/item-6.jpg",
+                active: false,
+                count: 0
+            },
+            {
+                name: "Фреш",
+                price: 5,
+                id: "q17",
+                img: "/src/assets/item-8.jpg",
                 active: false,
                 count: 0
             },
@@ -151,23 +159,15 @@ export default {
                 count: 0
             },
             {
-                name: "Хлеб",
-                price: 5,
-                id: "q17",
-                img: "/src/assets/item-8.jpg",
-                active: false,
-                count: 0
+            name: "Приборы",
+            price: 10,
+            id: "q18",
+            img: "/src/assets/item-9.jpg",
+            active: false,
+            count: 0
             },
             {
-                name: "Приборы",
-                price: 10,
-                id: "q18",
-                img: "/src/assets/item-9.jpg",
-                active: false,
-                count: 0
-            },
-            {
-                name: "Другое",
+            name: "Другое",
                 price: 1337,
                 id: "q19",
                 img: "/src/assets/item-9.jpg",
@@ -347,7 +347,8 @@ export default {
       display: flex;
       justify-content: space-between;
       width: 100%;
-      margin: 30px 5px;
+      margin: 5px;
+        padding-top: 5px;
         .disabled {
             width: 224px;
             height: 50px;
