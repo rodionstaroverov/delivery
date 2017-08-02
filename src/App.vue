@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div id="user-name" v-if="!user.status"> <!--here-->
+    <div id="user-name" v-if="!user.status">
       <p>Пожалуйста введите ваше имя</p>
       <input v-model="user.name" v-on:keyup.13="user.status = true" autofocus maxlength="30">
       <div class="user-name-submit" v-if="user.name && !user.status" v-on:click="user.status = true">OK</div>
@@ -18,7 +18,7 @@
 
 
 
-    <div class="main-content" v-if="user.status"> <!--here-->
+    <div class="main-content" v-if="user.status">
 
         <div class="product-list">
             <span>Категории</span>
@@ -32,7 +32,6 @@
                 <div v-for="category in categories" v-if="category.active">{{ category.name }}</div>
             </div>
             <div v-for="product in items" v-bind:id="product.id" class="product" v-if="product.category" v-bind:class="{ 'product-active': product.active }">
-              {{ product.category }}
               <img v-bind:src="product.img" class="product-image" />
               <div class="product-description">
                 <h4>{{ product.name }}</h4>
