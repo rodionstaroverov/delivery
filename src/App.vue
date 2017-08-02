@@ -23,14 +23,16 @@
         <div class="product-list">
             <span>Категории</span>
             <ul>
-                <li v-for="category in categories" v-bind:class="{ 'list-active': category.active }"  @click="isActive(category); sortList(category)">{{ category.name }}</li>
+                <li v-for="category in categories" v-bind:class="{ 'list-active': category.active }"  @click="isActive(category); even(categories)">{{ category.name }}</li>
             </ul>
         </div>
 
         <div class="product-items">
-            <div class="product-category">Все товары</div>
-            <div v-for="product in items" v-bind:id="product.id" class="product" v-show="1" v-bind:class="{ 'product-active': product.active }">
-                <!--{{ categories[1].active }}-->
+            <div class="product-category">
+                <div v-for="category in categories" v-if="category.active">{{ category.name }}</div>
+            </div>
+            <div v-for="product in items" v-bind:id="product.id" class="product" v-if="product.category" v-bind:class="{ 'product-active': product.active }">
+              {{ product.category }}
               <img v-bind:src="product.img" class="product-image" />
               <div class="product-description">
                 <h4>{{ product.name }}</h4>
@@ -105,13 +107,12 @@ export default {
           });
         s.active = true;
       },
-      sortList: function (s) {
-          console.log(s.name);
-//          this.categories.forEach(function () {
-//              for (var i = 0; i < categories.length; i++) {
-//                  console.log(1);
-//              }
-//          })
+      even: function (categories) {
+          return categories.forEach(function (s) {
+              if (s.active) {
+                  //console.log(s.active + " " + s.name);
+              }
+          })
       }
   },
   data () {
@@ -182,7 +183,8 @@ export default {
                 id: "q13",
                 img: "/src/assets/item-4.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             },
             {
                 name: "Роллы",
@@ -190,7 +192,8 @@ export default {
                 id: "q14",
                 img: "/src/assets/item-5.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             },
             {
                 name: "Кофе",
@@ -198,7 +201,8 @@ export default {
                 id: "q15",
                 img: "/src/assets/item-6.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             },
             {
                 name: "Фреш",
@@ -206,7 +210,8 @@ export default {
                 id: "q17",
                 img: "/src/assets/item-8.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             },
             {
                 name: "Десерт",
@@ -214,7 +219,8 @@ export default {
                 id: "q16",
                 img: "/src/assets/item-7.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             },
             {
             name: "Приборы",
@@ -222,7 +228,8 @@ export default {
             id: "q18",
             img: "/src/assets/item-9.jpg",
             active: false,
-            count: 0
+            count: 0,
+                category: "Салаты"
             },
             {
             name: "Другое",
@@ -230,7 +237,8 @@ export default {
                 id: "q19",
                 img: "/src/assets/item-9.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             }
         ]
     }
@@ -359,9 +367,10 @@ export default {
         margin-top: 1px;
         span {
             font-size: 20px;
-            text-align: center;
+            text-align: left;
             display: block;
             margin-bottom: 15px;
+            margin-left: 12px;
         }
         li {
             list-style: none;
@@ -388,6 +397,7 @@ export default {
             text-align: center;
             display: block;
             margin-bottom: 15px;
+            height: 32px;
         }
 
         .product {
