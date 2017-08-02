@@ -23,12 +23,12 @@
           <h4>{{ product.name }}</h4>
         </div>
         <div class="product-price">{{ product.price | currency}}</div>
-          <div class="success-btn" v-on:click="addActive(product)">Заказать</div>
+          <div class="success-btn" v-on:click="increaseProductQty(product)">Заказать</div>
       </div>
       <div class="total-order">
         <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
 
-          <div class="submit decline" @click="">Отменить</div>
+          <div class="submit decline" @click="removeActive({ items })">Отменить</div>
           <span>Общая сумма заказа: {{  total() | currency }}</span>
           <div class="submit" @click="order = !order">Далее</div>
       </div>
@@ -43,7 +43,7 @@
         <li><div>Общая сумма: </div><div>{{ total() | currency }}</div></li>
           <div class="order-btn">
             <div class="submit" @click="order = !order" v-if="order">Вернутсья</div>
-            <div class="submit" @click="removeActive()" v-if="order">Все верно</div>
+            <div class="submit" @click="" v-if="order">Все верно</div>
           </div>
       </ul>
     </div>
@@ -55,15 +55,17 @@
 export default {
   name: 'app',
   methods: {
-      addActive: function (s) {
+      increaseProductQty: function (s) {
           s.active = true;
+
+//          var newprice = 0;
+//          newprice += s.price;
+//          console.log(newprice);
       },
-      removeActive: function () {
-          product.active = false;
-      },
-      increaseProductQty: function(s){
-//          var price = s.price;
-//          console.log(price += 1);
+      removeActive: function (s) {
+          for (var i = 0; i < s.items.length; i++) {
+              s.items[i].active = false;
+          }
       },
       total: function(){
 
@@ -146,6 +148,13 @@ export default {
                 name: "Приборы",
                 price: 10,
                 id: "q18",
+                img: "/src/assets/item-9.jpg",
+                active: false
+            },
+            {
+                name: "Другое",
+                price: 1337,
+                id: "q19",
                 img: "/src/assets/item-9.jpg",
                 active: false
             }
