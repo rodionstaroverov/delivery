@@ -4,49 +4,62 @@
       <p>Пожалуйста введите ваше имя</p>
       <input v-model="user.name" v-on:keyup.13="user.status = true" autofocus maxlength="30">
       <div class="user-name-submit" v-if="user.name && !user.status" v-on:click="user.status = true">OK</div>
-      <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
     </div>
 
     <header v-if="user.status">
-      <div class="logo"></div>
-      <div class="current-user">Вы зашли как: {{ user.name }}</div>
-      <div id="orders">
-        <a href="#">Посмореть общий заказ </a>
-      </div>
+        <div class="header-items">
+          <div class="logo"></div>
+          <div class="current-user">Вы зашли как: {{ user.name }}</div>
+          <div id="orders">
+            <a href="#">Общий заказ </a>
+          </div>
+        </div>
     </header>
 
-    <div class="main-content" v-if="!order && user.status"> <!--here-->
 
-        <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:class="{ 'product-active': product.active }">
-          <img v-bind:src="product.img" class="product-image" />
-          <div class="product-description">
-            <h4>{{ product.name }}</h4>
-        </div>
-          <div class="product-price">{{ product.price | currency }}</div>
-          <div class="success-btn" v-on:click="increaseProductQty(product)">Заказать</div>
-      </div>
-        <div class="total-order">
-            <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
-            <div class="submit decline" @click="removeActive({ items })">Отменить</div>
-            <span>Общая сумма заказа: {{  total() | currency }}</span>
-            <div class="disabled" @click="order = !order"><div class="submit" v-if="total()">Далее</div></div>
+
+    <div class="main-content" v-if="user.status"> <!--here-->
+
+        <div class="product-list">
+            <span>Категории</span>
+            <ul>
+                <li v-for="category in categories" v-bind:class="{ 'list-active': category.active }"  @click="isActive(category); sortList(category)">{{ category.name }}</li>
+            </ul>
         </div>
 
-    </div>
-
-    <div class="order-table" v-if="order">
-      <p>Подтвердите заказ</p>
-      <ul>
-          <li><div>Название</div><div>Количество</div><div>Стоимость</div></li>
-        <li v-if="a.active" v-for="a in items"><div>{{ a.name }}</div><div>{{ a.count }} шт.</div><div>{{ (a.price * a.count) | currency }}</div></li>
-        <hr>
-        <li><div>Общая сумма: </div><div>{{ totalQty() }} шт.</div><div>{{ total() | currency }}</div></li>
-          <div class="order-btn">
-            <div class="submit" @click="order = !order" v-if="order">Вернутсья</div>
-            <div class="submit" @click="" v-if="order">Все верно</div>
+        <div class="product-items">
+            <div class="product-category">Все товары</div>
+            <div v-for="product in items" v-bind:id="product.id" class="product" v-show="1" v-bind:class="{ 'product-active': product.active }">
+                <!--{{ categories[1].active }}-->
+              <img v-bind:src="product.img" class="product-image" />
+              <div class="product-description">
+                <h4>{{ product.name }}</h4>
+            </div>
+              <div class="product-price">{{ product.price | currency }}</div>
+              <div class="success-btn" v-on:click="order = true; increaseProductQty(product)">Заказать</div>
           </div>
-      </ul>
+        </div>
+
+        <div class="checkout">
+            <span>Миникорзина</span>
+            <div class="order-table" v-if="order">
+                <ul>
+                    <li v-if="a.active" v-for="a in items"><div>{{ a.name }}</div><div>X {{ a.count }}</div><div>{{ (a.price * a.count) | currency }}</div></li>
+                    <hr />
+                    <li><div>Общая сумма: </div><div>X {{ totalQty() }}</div><div>{{ total() | currency }}</div></li>
+                    <div class="order-btn">
+                        <div class="submit" @click="removeActive({ items }); order = false;">Сбросить</div>
+                        <div class="submit">Все верно</div>
+                    </div>
+                </ul>
+            </div>
+            <span v-if="!order">Ваша корзина пуста</span>
+
+            <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
+        </div>
+
     </div>
+
 
   </div>
 </template>
@@ -83,11 +96,53 @@ export default {
               }
           });
           return totalQty;
+      },
+      isActive: function (s) {
+          this.categories.forEach(function(s){
+              if (s.active) {
+                  s.active = false;
+              }
+          });
+        s.active = true;
+      },
+      sortList: function (s) {
+          console.log(s.name);
+//          this.categories.forEach(function () {
+//              for (var i = 0; i < categories.length; i++) {
+//                  console.log(1);
+//              }
+//          })
       }
   },
   data () {
     return {
         order: false,
+        categories: [
+            {
+                name: "Первые блюда",
+                active: false
+            },
+            {
+                name: "Вторые блюда",
+                active: false
+            },
+            {
+                name: "Салаты",
+                active: false
+            },
+            {
+                name: "Бургеры",
+                active: false
+            },
+            {
+                name: "Десерты",
+                active: false
+            },
+            {
+                name: "Напитки",
+                active: false
+            }
+      ],
         user:
             {
                 name: "",
@@ -100,7 +155,8 @@ export default {
                 id: "q10",
                 img: "/src/assets/item-1.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Бургеры"
             },
             {
                 name: "Второе блюдо",
@@ -108,7 +164,8 @@ export default {
                 id: "q11",
                 img: "/src/assets/item-2.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Бургеры"
             },
             {
                 name: "Салат",
@@ -116,7 +173,8 @@ export default {
                 id: "q12",
                 img: "/src/assets/item-3.jpg",
                 active: false,
-                count: 0
+                count: 0,
+                category: "Салаты"
             },
             {
                 name: "Бутерброд",
@@ -250,27 +308,35 @@ export default {
   }
 
   header {
-    width: 1170px;
-    height: 100px;
-    display: flex;
-    margin: 30px auto;
-    justify-content: space-between;
-    /*background-color: #75e0d3;*/
+      width: 100%;
+      height: 70px;
+      position: fixed;
+      background-color: $main-color;
+      top: 0;
+      z-index: 100;
+      .header-items {
+          width: 1170px;
+          display: flex;
+          margin: 0 auto;
+          justify-content: space-between;
+          height: 100%;
+          border-bottom: 1px solid $color-white;
+      }
     .logo {
-      margin: 10px 0 0 10px;
-      width: 160px;
-      height: 80px;
+        margin: 5px 0 0 5px;
+        width: 160px;
+        height: 50px;
       background: url(assets/logo.svg) no-repeat;
     }
     .current-user {
       font-size: 20px;
-      line-height: 4.7;
+      line-height: 3.4;
     }
     #orders {
       margin-right: 7px;
       height: 50px;
       font-size: 20px;
-      line-height: 4.7;
+      line-height: 3.4;
       a {
         color: $color-white;
         text-decoration: none;
@@ -283,114 +349,172 @@ export default {
 
   .main-content {
     width: 1170px;
-    margin: 0 auto;
-      .product-active {
-          box-shadow: 0 0 15px $color-green;
-      }
-    .product {
-        height: 400px;
-        width: 224px;
-        margin: 5px;
-        display: block;
-        float: left;
-        background: $main-color;
-        border: 1px solid $main-color-dark;
-        border-bottom: 1px solid $color-white;
-        box-sizing: border-box;
-        user-select: none;
-        &:hover {
-            color: #fff;
-        }
-
-        img {
-            width: 100%;
-            height: 165px;
-            display: block;
-        }
-      h4 {
-        margin-top: 30px;
-          height: 60px;
-          line-height: 2.5;
-          text-align: center;
-      }
-        .success-btn {
-            width: 90%;
-            margin: 40px auto;
-            height: 35px;
-            background-color: $color-green;
-            color: $color-white;
-            text-align: center;
-            line-height: 1.8;
-            font-size: 18px;
-            cursor: pointer;
-            &:hover {
-                background-color: darken($color-green, 10%);
-                color: $color-white;
-            }
-            &:active {
-                background-color: $color-green;
-            }
-        }
-      .product-description {
-        background: $main-color-dark;
-        font-size: 24px;
-      }
-      .product-price {
-        text-align: center;
-        color: $color-white;
-        font-size: 18px;
-        background: $main-color;
-      }
-    }
-    .total-order {
-      font-size: 26px;
+    margin: 80px auto;
       display: flex;
       justify-content: space-between;
-      width: 100%;
-      margin: 5px;
-        padding-top: 5px;
-        .disabled {
-            width: 224px;
-            height: 50px;
-            margin-right: 10px;
-        }
-      .submit {
-        width: 224px;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        background-color: $color-green;
-        color: $color-white;
-        cursor: pointer;
-        line-height: 1.8;
+    .product-list {
+      width: 180px;
+      display: block;
         user-select: none;
-        &:hover {
-          background-color: darken($color-green, 10%);
+        margin-top: 1px;
+        span {
+            font-size: 20px;
+            text-align: center;
+            display: block;
+            margin-bottom: 15px;
         }
-        &.decline {
-            background-color: $color-red;
+        li {
+            list-style: none;
+            font-size: 20px;
+            margin-bottom: 3px;
+            width: 150px;
+            padding: 7px;
+            display: block;
+            cursor: pointer;
+            margin-left: -35px;
             &:hover {
-                background-color: darken($color-red, 10%);
+                background-color: darken($main-color-dark, 10%);
             }
         }
-      }
-      span {
-          line-height: 2.1;
-      }
+
+        .list-active {
+            background-color: darken($main-color-dark, 10%);
+        }
     }
+    .product-items {
+        width: 677px;
+        .product-category {
+            font-size: 20px;
+            text-align: center;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .product {
+            height: 400px;
+            width: 219px;
+            margin: 3px;
+            display: block;
+            float: left;
+            background: $main-color;
+            border: 1px solid $main-color-dark;
+            box-sizing: border-box;
+            user-select: none;
+            &:hover {
+                color: #fff;
+            }
+
+            img {
+                width: 100%;
+                height: 165px;
+                display: block;
+            }
+            h4 {
+                margin-top: 30px;
+                height: 60px;
+                line-height: 2.5;
+                text-align: center;
+            }
+            .success-btn {
+                width: 90%;
+                margin: 40px auto;
+                height: 35px;
+                background-color: $color-green;
+                color: $color-white;
+                text-align: center;
+                line-height: 1.8;
+                font-size: 18px;
+                cursor: pointer;
+                &:hover {
+                    background-color: darken($color-green, 10%);
+                    color: $color-white;
+                }
+                &:active {
+                    background-color: $color-green;
+                }
+            }
+            .product-description {
+                background: $main-color-dark;
+                font-size: 24px;
+            }
+            .product-price {
+                text-align: center;
+                color: $color-white;
+                font-size: 18px;
+                background: $main-color;
+            }
+        }
+        .total-order {
+            font-size: 26px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin: 5px;
+            padding-top: 5px;
+            .disabled {
+                width: 224px;
+                height: 50px;
+                margin-right: 10px;
+            }
+            .submit {
+                width: 224px;
+                height: 50px;
+                display: flex;
+                justify-content: center;
+                background-color: $color-green;
+                color: $color-white;
+                cursor: pointer;
+                line-height: 1.8;
+                user-select: none;
+                &:hover {
+                    background-color: darken($color-green, 10%);
+                }
+                &.decline {
+                    background-color: $color-red;
+                    &:hover {
+                        background-color: darken($color-red, 10%);
+                    }
+                }
+            }
+            span {
+                line-height: 2.1;
+            }
+        }
+    }
+
+      .checkout {
+          width: 290px;
+          display: block;
+          span {
+              font-size: 20px;
+              text-align: center;
+              display: block;
+              margin-bottom: 15px;
+              width: 290px;
+              &:nth-child(2) {
+                  margin-top: 20px;
+              }
+          }
+      }
+
   }
   .order-table {
-    width: 1170px;
+    width: 290px;
     margin: 0 auto;
-    font-size: 22px;
+    font-size: 18px;
       li {
           display: flex;
           justify-content: space-between;
           div {
-              width: 33%;
               text-align: right;
+              width: 40%;
               &:nth-child(1) {
                   text-align: left;
+                  width: 40%;
+              }
+              &:nth-child(2) {
+                  text-align: center;
+                  width: 20%;
               }
           }
       }
@@ -398,14 +522,14 @@ export default {
           display: flex;
           justify-content: space-between;
           .submit {
-              width: 150px;
+              width: 110px;
               height: 40px;
               display: flex;
               justify-content: center;
               background-color: $color-green;
               color: $color-white;
               cursor: pointer;
-              line-height: 1.7;
+              line-height: 2.1;
               user-select: none;
               margin-top: 30px;
               &:hover {
@@ -426,12 +550,14 @@ export default {
     }
     ul {
       margin: 0 auto;
-      width: 480px;
+      width: 270px;
+        margin-left: -30px;
       li {
         list-style: none;
         display: flex;
         justify-content: space-between;
-        width: 480px;
+        width: 270px;
+
       }
     }
 
