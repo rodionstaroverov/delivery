@@ -16,21 +16,23 @@
     </header>
 
     <div class="main-content" v-if="!order && user.status"> <!--here-->
-      <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:class="{ 'product-active': product.active }">
+
+        <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:class="{ 'product-active': product.active }">
           <img v-bind:src="product.img" class="product-image" />
-        <div class="product-description">
-          <h4>{{ product.name }}</h4>
+          <div class="product-description">
+            <h4>{{ product.name }}</h4>
         </div>
-        <div class="product-price">{{ product.price | currency }}</div>
+          <div class="product-price">{{ product.price | currency }}</div>
           <div class="success-btn" v-on:click="increaseProductQty(product)">Заказать</div>
       </div>
-      <div class="total-order">
-        <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
+        <div class="total-order">
+            <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
 
-          <div class="submit decline" @click="removeActive({ items })">Отменить</div>
-          <span>Общая сумма заказа: {{  total() | currency }}</span>
-          <div class="submit" @click="order = !order">Далее</div>
-      </div>
+            <div class="submit decline" @click="removeActive({ items })">Отменить</div>
+            <span>Общая сумма заказа: {{  total() | currency }}</span>
+            <div class="sumbit-disabled"><div class="submit" v-if="total()" @click="order = !order">Далее</div></div>
+
+        </div>
 
     </div>
 
@@ -181,12 +183,13 @@ export default {
 </script>
 
 <style lang="scss">
-  $main-color: #3E5262;
-  $main-color-dark: #384A59;
-  $color-white: #fff;
-  $color-green: #1db590;
-  $color-light-green: #75e0d3;
-  $color-red: #d73d59;
+    $main-color-light: #465b6c;
+    $main-color: #3E5262;
+    $main-color-dark: #384A59;
+    $color-white: #fff;
+    $color-green: #1db590;
+    $color-light-green: #75e0d3;
+    $color-red: #d73d59;
 
   body {
     background-color: $main-color;
@@ -327,9 +330,7 @@ export default {
                 color: $color-white;
             }
             &:active {
-                .product {
-                    transform: rotate(90deg);
-                }
+                background-color: $color-green;
             }
         }
       .product-description {
@@ -370,6 +371,10 @@ export default {
             }
         }
       }
+        .sumbit-disabled {
+            width: 224px;
+            display: block;
+        }
       span {
           line-height: 2.1;
       }
@@ -406,6 +411,12 @@ export default {
               margin-top: 30px;
               &:hover {
                   background-color: darken($color-green, 10%);
+              }
+              &:nth-child(1) {
+                  background-color: $color-red;
+                  &:hover {
+                      background-color: darken($color-red, 10%);
+                  }
               }
           }
       }
