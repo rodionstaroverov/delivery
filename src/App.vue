@@ -1,10 +1,9 @@
 <template>
   <div id="app">
-    <div id="user-name" v-if="!user.status">
+    <div id="user-name" v-if="!user.status"> <!--here-->
       <p>Пожалуйста введите ваше имя</p>
       <input v-model="user.name" v-on:keyup.13="user.status = true" autofocus maxlength="30">
       <div class="user-name-submit" v-if="user.name && !user.status" v-on:click="user.status = true">OK</div>
-
       <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
     </div>
 
@@ -16,13 +15,13 @@
       </div>
     </header>
 
-    <div class="main-content" v-if="!order && user.status">
+    <div class="main-content" v-if="!order && user.status"> <!--here-->
       <div v-for="product in items" v-bind:id="product.id" class="product" v-bind:class="{ 'product-active': product.active }">
           <img v-bind:src="product.img" class="product-image" />
         <div class="product-description">
           <h4>{{ product.name }}</h4>
         </div>
-        <div class="product-price">{{ product.price | currency}}</div>
+        <div class="product-price">{{ product.price | currency }}</div>
           <div class="success-btn" v-on:click="increaseProductQty(product)">Заказать</div>
       </div>
       <div class="total-order">
@@ -38,9 +37,10 @@
     <div class="order-table" v-if="order">
       <p>Подтвердите заказ</p>
       <ul>
-        <li v-if="a.active" v-for="a in items"><div>{{ a.name }}</div> <div>{{ a.price | currency }}</div></li>
+          <li><div>Название</div><div>Количество</div><div>Стоимость</div></li>
+        <li v-if="a.active" v-for="a in items"><div>{{ a.name }}</div><div>{{ a.count }} шт.</div><div>{{ (a.price * a.count) | currency }}</div></li>
         <hr>
-        <li><div>Общая сумма: </div><div>{{ total() | currency }}</div></li>
+        <li><div>Общая сумма: </div><div>{{ totalQty() }} шт.</div><div>{{ total() | currency }}</div></li>
           <div class="order-btn">
             <div class="submit" @click="order = !order" v-if="order">Вернутсья</div>
             <div class="submit" @click="" v-if="order">Все верно</div>
@@ -57,26 +57,32 @@ export default {
   methods: {
       increaseProductQty: function (s) {
           s.active = true;
-
-//          var newprice = 0;
-//          newprice += s.price;
-//          console.log(newprice);
+          s.count += 1;
       },
       removeActive: function (s) {
           for (var i = 0; i < s.items.length; i++) {
               s.items[i].active = false;
+              s.items[i].count = 0;
           }
       },
-      total: function(){
-
+      total: function() {
           var total = 0;
-
-          this.items.forEach(function(s){
-              if (s.active){
-                  total+= s.price;
+          var totalQty = 0;
+          this.items.forEach(function(s) {
+              if (s.active) {
+                  total += s.price * s.count;
               }
           });
           return total;
+      },
+      totalQty: function() {
+          var totalQty = 0;
+          this.items.forEach(function(s){
+              if (s.active) {
+                  totalQty +=  s.count;
+              }
+          });
+          return totalQty;
       }
   },
   data () {
@@ -93,70 +99,80 @@ export default {
                 price: 130,
                 id: "q10",
                 img: "/src/assets/item-1.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Второе блюдо",
                 price: 110,
                 id: "q11",
                 img: "/src/assets/item-2.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Салат",
                 price: 65,
                 id: "q12",
                 img: "/src/assets/item-3.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Бутерброд",
                 price: 70,
                 id: "q13",
                 img: "/src/assets/item-4.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Лимонад",
                 price: 50,
                 id: "q14",
                 img: "/src/assets/item-5.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Чай",
                 price: 20,
                 id: "q15",
                 img: "/src/assets/item-6.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Десерт",
                 price: 75,
                 id: "q16",
                 img: "/src/assets/item-7.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Хлеб",
                 price: 5,
                 id: "q17",
                 img: "/src/assets/item-8.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Приборы",
                 price: 10,
                 id: "q18",
                 img: "/src/assets/item-9.jpg",
-                active: false
+                active: false,
+                count: 0
             },
             {
                 name: "Другое",
                 price: 1337,
                 id: "q19",
                 img: "/src/assets/item-9.jpg",
-                active: false
+                active: false,
+                count: 0
             }
         ]
     }
@@ -165,20 +181,22 @@ export default {
 </script>
 
 <style lang="scss">
-  $color-white: #f5f0f0;
+  $main-color: #3E5262;
+  $main-color-dark: #384A59;
+  $color-white: #fff;
   $color-green: #1db590;
   $color-light-green: #75e0d3;
   $color-red: #d73d59;
 
   body {
-    background-color: $color-white;
+    background-color: $main-color;
     margin: 0;
     padding: 0;
   }
 
   * {
     font-family: 'Open Sans Condensed', sans-serif;
-
+      color: $color-white;
   }
 
   ::SELECTION {
@@ -192,21 +210,22 @@ export default {
     display: block;
     position: absolute;
     z-index: 100;
-    background-color: $color-white;
+    background-color: $main-color;
     font-size: 28px;
+      color: $color-white;
     input {
       height: 40px;
       width: 99vw;
       text-align: center;
       font-size: 28px;
-      background-color: $color-white;
+      background-color: $main-color;
       border: none;
       margin-left: 7px;
+        color: $color-white;
     }
     p {
       margin-top: 33vh;
       text-align: center;
-      color: #666666;
     }
     input:focus {
       outline: none;
@@ -214,7 +233,7 @@ export default {
   }
 
   .user-name-submit {
-    background-color: $color-light-green;
+    background-color: $color-green;
     width: 120px;
     height: 40px;
     display: block;
@@ -225,7 +244,7 @@ export default {
     line-height: 1.9;
     cursor: pointer;
     &:hover {
-      background-color: $color-green;
+      background-color: darken($color-green, 10%);
     }
   }
 
@@ -252,7 +271,7 @@ export default {
       font-size: 20px;
       line-height: 4.7;
       a {
-        color: #000;
+        color: $color-white;
         text-decoration: none;
         &:hover {
           text-decoration: underline;
@@ -265,7 +284,7 @@ export default {
     width: 1170px;
     margin: 0 auto;
       .product-active {
-          box-shadow: 0 0 10px #3cb371;
+          box-shadow: 0 0 15px $color-green;
       }
     .product {
         height: 400px;
@@ -273,13 +292,15 @@ export default {
         margin: 5px;
         display: block;
         float: left;
-        background: $color-white;
-        border: 1px solid #e1dcdc;
+        background: $main-color;
+        border: 1px solid $main-color-dark;
+        border-bottom: 1px solid $color-white;
         box-sizing: border-box;
         user-select: none;
         &:hover {
             color: #fff;
         }
+
         img {
             width: 100%;
             height: 165px;
@@ -305,17 +326,21 @@ export default {
                 background-color: darken($color-green, 10%);
                 color: $color-white;
             }
+            &:active {
+                .product {
+                    transform: rotate(90deg);
+                }
+            }
         }
       .product-description {
-        color: #333;
-        background: #f0ebeb;
+        background: $main-color-dark;
         font-size: 24px;
       }
       .product-price {
         text-align: center;
-        color: #333;
+        color: $color-white;
         font-size: 18px;
-        background: $color-white;
+        background: $main-color;
       }
     }
     .total-order {
@@ -354,6 +379,17 @@ export default {
     width: 1170px;
     margin: 0 auto;
     font-size: 22px;
+      li {
+          display: flex;
+          justify-content: space-between;
+          div {
+              width: 33%;
+              text-align: right;
+              &:nth-child(1) {
+                  text-align: left;
+              }
+          }
+      }
       .order-btn {
           display: flex;
           justify-content: space-between;
