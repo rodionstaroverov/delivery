@@ -27,11 +27,9 @@
       </div>
         <div class="total-order">
             <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
-
             <div class="submit decline" @click="removeActive({ items })">Отменить</div>
             <span>Общая сумма заказа: {{  total() | currency }}</span>
-            <div class="sumbit-disabled"><div class="submit" v-if="total()" @click="order = !order">Далее</div></div>
-
+            <div class="disabled" @click="order = !order"><div class="submit" v-if="total()">Далее</div></div>
         </div>
 
     </div>
@@ -350,6 +348,11 @@ export default {
       justify-content: space-between;
       width: 100%;
       margin: 30px 5px;
+        .disabled {
+            width: 224px;
+            height: 50px;
+            margin-right: 10px;
+        }
       .submit {
         width: 224px;
         height: 50px;
@@ -360,7 +363,6 @@ export default {
         cursor: pointer;
         line-height: 1.8;
         user-select: none;
-        margin: 5px 10px 0 0;
         &:hover {
           background-color: darken($color-green, 10%);
         }
@@ -371,10 +373,6 @@ export default {
             }
         }
       }
-        .sumbit-disabled {
-            width: 224px;
-            display: block;
-        }
       span {
           line-height: 2.1;
       }
