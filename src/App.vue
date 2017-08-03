@@ -1,28 +1,39 @@
 <template>
     <div id="app">
         <div id="user-name" v-if="!user.status">
-            <p>Пожалуйста введите ваше имя</p>
-            <input v-model="user.name" autofocus maxlength="30">
-            <div class="user-name-submit" v-if="user.name && !user.status" v-on:click="user.status = true">OK</div>
+            <!--<p>Пожалуйста введите ваш логин и пароль</p>-->
+            <div class="user-data">
+                <span>Логин:</span>
+                <input v-model="user.login" maxlength="30">
+            </div>
+
+            <div class="user-data">
+                <span>Пароль:</span>
+                <input type="password" v-model="user.password" maxlength="30">
+            </div>
+            <div class="user-confirm" v-if="user.login.length >= 4 && user.password.length >= 6 && !user.status">
+                <div class="user-name-submit" v-on:click="user.status = true">OK</div>
+                <div class="user-name-submit btn-blue">Общий заказ</div>
+            </div>
         </div>
+        <pre style="font-size: 16px; position: absolute; top: 10px; left: 10px; z-index: 1000;">{{ $data.user | json }}</pre>
 
         <header v-if="user.status">
             <div class="header-items">
                 <div class="logo"></div>
                 <div class="current-user">Вы зашли как: {{ user.name }}</div>
-                <div id="orders">
-                    <a href="#">Общий заказ </a>
+                <div class="orders">
+                    <div>Общий заказ </div>
                 </div>
             </div>
         </header>
-
 
         <div class="main-content" v-if="user.status">
 
             <div class="product-list">
                 <span>Категории</span>
                 <ul>
-                    <li v-bind:class="{ 'list-active': !activeCategory }" @click="activeCategory = false">Все товары</li>
+                    <li v-bind:class="{ 'list-active': !activeCategory }" @click="activeCategory = false; activeList(category)">Все товары</li>
                     <li v-for="category in categories" v-bind:class="{ 'list-active': category.active }"
                         @click="activeList(category); activeCategory = category.name">{{ category.name }}
                     </li>
@@ -78,8 +89,6 @@
                     </ul>
                 </div>
                 <span v-if="!order">Ваша корзина пуста</span>
-
-                <!--<pre style="font-size: 12px;">{{ $data | json }}</pre>-->
             </div>
 
         </div>
@@ -162,7 +171,9 @@
                 ],
                 user:
                     {
-                        name: "",
+                        name: "Родион Староверов",
+                        login: "staroverov",
+                        password: "qwerty123",
                         status: false
                     },
                 items: [
@@ -291,20 +302,28 @@
         width: 100%;
         height: 100%;
         display: block;
-        position: absolute;
+        //position: absolute;
         z-index: 100;
         background-color: $main-color;
-        font-size: 28px;
+        font-size: 22px;
         color: $color-white;
+        margin-top: 33vh;
+        .user-data {
+            display: block;
+            margin: 0 auto;
+            width: 300px;
+            font-size: 18px;
+        }
         input {
             height: 40px;
-            width: 99vw;
             text-align: center;
-            font-size: 28px;
-            background-color: $main-color;
+            font-size: 22px;
+            background-color: white;
             border: none;
-            margin-left: 7px;
-            color: $color-white;
+            color: #333;
+            width: 300px;
+            margin: 20px auto;
+            display: block;
         }
         p {
             margin-top: 33vh;
@@ -315,19 +334,30 @@
         }
     }
 
-    .user-name-submit {
-        background-color: $color-green;
-        width: 120px;
-        height: 40px;
-        display: block;
-        margin: 30px auto;
-        color: $color-white;
-        font-size: 20px;
-        text-align: center;
-        line-height: 1.9;
-        cursor: pointer;
-        &:hover {
-            background-color: darken($color-green, 10%);
+    .user-confirm {
+        width: 300px;
+        display: flex;
+        justify-content: space-between;
+        margin: 0 auto;
+        .user-name-submit {
+            background-color: $color-green;
+            width: 120px;
+            height: 40px;
+            display: block;
+            color: $color-white;
+            font-size: 20px;
+            text-align: center;
+            line-height: 1.9;
+            cursor: pointer;
+            &:hover {
+                background-color: darken($color-green, 10%);
+            }
+        }
+        .btn-blue {
+            background-color: lighten($main-color-light, 10%);
+            &:hover {
+                background-color: $main-color-light;
+            }
         }
     }
 
@@ -356,18 +386,11 @@
             font-size: 20px;
             line-height: 3.4;
         }
-        #orders {
+        .orders {
             margin-right: 7px;
             height: 50px;
             font-size: 20px;
             line-height: 3.4;
-            a {
-                color: $color-white;
-                text-decoration: none;
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
         }
     }
 
