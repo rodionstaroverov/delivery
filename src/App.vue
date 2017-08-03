@@ -2,7 +2,7 @@
     <div id="app">
         <div id="user-name" v-if="!user.status">
             <p>Пожалуйста введите ваше имя</p>
-            <input v-model="user.name" v-on:keyup.13="user.status = true" autofocus maxlength="30">
+            <input v-model="user.name" autofocus maxlength="30">
             <div class="user-name-submit" v-if="user.name && !user.status" v-on:click="user.status = true">OK</div>
         </div>
 
@@ -22,19 +22,32 @@
             <div class="product-list">
                 <span>Категории</span>
                 <ul>
+                    <li v-bind:class="{ 'list-active': !activeCategory }" @click="activeCategory = false">Все товары</li>
                     <li v-for="category in categories" v-bind:class="{ 'list-active': category.active }"
-                        @click="isActive(category); even(categories)">{{ category.name }}
+                        @click="activeList(category); activeCategory = category.name">{{ category.name }}
                     </li>
                 </ul>
             </div>
 
             <div class="product-items">
                 <div class="product-category">
-                    <div v-for="category in categories" v-if="category.active">{{ category.name }}</div>
+                    <div v-for="category in categories" v-if="category.active && activeCategory">{{ category.name }}</div>
+                    <div v-show="!activeCategory">Все товары</div>
                 </div>
-                <div v-for="product in items" v-bind:id="product.id" class="product" v-if="product.category"
-                     v-bind:class="{ 'product-active': product.active }">
-                    <img v-bind:src="product.img" class="product-image"/>
+
+                <!-- all -->
+                <div v-for="product in items" v-if="!activeCategory" v-bind:id="product.id"  class="product" v-bind:class="{ 'product-active': product.active }">
+                    <img v-bind:src="product.img" class="product-image" />
+                    <div class="product-description">
+                        <h4>{{ product.name }}</h4>
+                    </div>
+                    <div class="product-price">{{ product.price | currency }}</div>
+                    <div class="success-btn" v-on:click="order = true; increaseProductQty(product)">Заказать</div>
+                </div>
+
+                <!-- sorted -->
+                <div v-for.stop="product in items" v-else-if="activeCategory == product.category" v-bind:id="product.id"  class="product" v-bind:class="{ 'product-active': product.active }">
+                    <img v-bind:src="product.img" class="product-image" />
                     <div class="product-description">
                         <h4>{{ product.name }}</h4>
                     </div>
@@ -108,25 +121,19 @@
                 });
                 return totalQty;
             },
-            isActive: function (s) {
+            activeList: function (s) {
                 this.categories.forEach(function (s) {
                     if (s.active) {
                         s.active = false;
                     }
                 });
                 s.active = true;
-            },
-            even: function (categories) {
-                return categories.forEach(function (s) {
-                    if (s.active) {
-                        //console.log(s.active + " " + s.name);
-                    }
-                })
             }
         },
         data() {
             return {
                 order: false,
+                activeCategory: false,
                 categories: [
                     {
                         name: "Первые блюда",
@@ -235,7 +242,7 @@
                         name: "Приборы",
                         price: 10,
                         id: "q18",
-                        img: "/src/assets/item-9.jpg",
+                        img: "/src/assets/item-7.jpg",
                         active: false,
                         count: 0,
                         category: "Салаты"
@@ -244,7 +251,7 @@
                         name: "Другое",
                         price: 1337,
                         id: "q19",
-                        img: "/src/assets/item-9.jpg",
+                        img: "/src/assets/item-7.jpg",
                         active: false,
                         count: 0,
                         category: "Салаты"
@@ -405,7 +412,7 @@
                 font-size: 20px;
                 text-align: center;
                 display: block;
-                margin-bottom: 15px;
+                margin-bottom: 8px;
                 height: 32px;
             }
 
