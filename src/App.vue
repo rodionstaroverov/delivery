@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <div id="user-name" v-if="!user.status">
+        <div class="user-name" v-if="!user.status">
             <!--<p>Пожалуйста введите ваш логин и пароль</p>-->
             <div class="user-data">
                 <span>Логин:</span>
@@ -12,13 +12,17 @@
                 <input type="password" v-model="user.password" maxlength="30">
             </div>
             <div class="user-confirm" v-if="user.login.length >= 4 && user.password.length >= 6 && !user.status">
-                <div class="user-name-submit" v-on:click="user.status = true">OK</div>
+                <div class="user-name-submit" v-on:click="(user.status = true) && auth()">OK</div>
                 <div class="user-name-submit btn-blue">Общий заказ</div>
             </div>
         </div>
-        <pre style="font-size: 16px; position: absolute; top: 10px; left: 10px; z-index: 1000;">{{ $data.user | json }}</pre>
+        <pre style="font-size: 16px; position: absolute; top: 10px; left: 10px; z-index: 1000;">
+        {{ $data.user | json }}
+        <hr>
+            <!--{{ $data.usersOrder | json }}-->
+        </pre>
 
-        <header v-if="user.status">
+        <header v-if="user.status && authStatus">
             <div class="header-items">
                 <div class="logo"></div>
                 <div class="current-user">Вы зашли как: {{ user.name }}</div>
@@ -28,12 +32,15 @@
             </div>
         </header>
 
-        <div class="main-content" v-if="user.status">
+        <div class="main-content" v-if="user.status && authStatus">
 
             <div class="product-list">
+
                 <span>Категории</span>
                 <ul>
-                    <li v-bind:class="{ 'list-active': !activeCategory }" @click="activeCategory = false; activeList(category)">Все товары</li>
+                    <li v-bind:class="{ 'list-active': !activeCategory }"
+                        @click="activeCategory = false; activeList(category)">Все товары
+                    </li>
                     <li v-for="category in categories" v-bind:class="{ 'list-active': category.active }"
                         @click="activeList(category); activeCategory = category.name">{{ category.name }}
                     </li>
@@ -42,13 +49,15 @@
 
             <div class="product-items">
                 <div class="product-category">
-                    <div v-for="category in categories" v-if="category.active && activeCategory">{{ category.name }}</div>
+                    <div v-for="category in categories" v-if="category.active && activeCategory">{{ category.name }}
+                    </div>
                     <div v-show="!activeCategory">Все товары</div>
                 </div>
 
                 <!-- all -->
-                <div v-for="product in items" v-if="!activeCategory" v-bind:id="product.id"  class="product" v-bind:class="{ 'product-active': product.active }">
-                    <img v-bind:src="product.img" class="product-image" />
+                <div v-for="product in items" v-if="!activeCategory" v-bind:id="product.id" class="product"
+                     v-bind:class="{ 'product-active': product.active }">
+                    <img v-bind:src="product.img" class="product-image"/>
                     <div class="product-description">
                         <h4>{{ product.name }}</h4>
                     </div>
@@ -57,8 +66,9 @@
                 </div>
 
                 <!-- sorted -->
-                <div v-for.stop="product in items" v-else-if="activeCategory == product.category" v-bind:id="product.id"  class="product" v-bind:class="{ 'product-active': product.active }">
-                    <img v-bind:src="product.img" class="product-image" />
+                <div v-for.stop="product in items" v-else-if="activeCategory == product.category" v-bind:id="product.id"
+                     class="product" v-bind:class="{ 'product-active': product.active }">
+                    <img v-bind:src="product.img" class="product-image"/>
                     <div class="product-description">
                         <h4>{{ product.name }}</h4>
                     </div>
@@ -84,13 +94,17 @@
                         </li>
                         <div class="order-btn">
                             <div class="submit" @click="removeActive({ items }); order = false;">Сбросить</div>
-                            <div class="submit">Все верно</div>
+                            <div class="submit" @click="confirmOrder()">Все верно</div>
                         </div>
                     </ul>
                 </div>
                 <span v-if="!order">Ваша корзина пуста</span>
             </div>
 
+        </div>
+
+        <div v-if="user.status && !authStatus" class="auth-error">
+            Вы сегодня уже сделали заказ, приходите завтра :)
         </div>
 
 
@@ -137,10 +151,45 @@
                     }
                 });
                 s.active = true;
+            },
+            confirmOrder: function () {
+                this.usersOrder.push({
+                    username: this.user.name,
+                    totalPrice: this.total(),
+                    totalQty: this.totalQty(),
+                    order: true
+                });
+                this.user.order = true;
+            },
+            auth: function () {
+                var activeOrders = [];
+                this.usersOrder.forEach(function (s) {
+                    if (!s.order) {
+                        activeOrders.push(s.username);
+                    }
+                });
+                var x = 0;
+                for (var i = 0; i < activeOrders.length; i++) {
+                    if (activeOrders[i] == this.user.login) {
+                        x = x + 1;
+                    }
+
+                    function checkX() {
+                        if (x > 0) {
+                            return 0;
+                        }
+                        else {
+                            return 1;
+                        }
+                    }
+
+                    this.authStatus = checkX();
+                }
             }
         },
         data() {
             return {
+                authStatus: false,
                 order: false,
                 activeCategory: false,
                 categories: [
@@ -171,11 +220,39 @@
                 ],
                 user:
                     {
-                        name: "Родион Староверов",
-                        login: "staroverov",
-                        password: "qwerty123",
-                        status: false
+                        name: "Родион",
+                        login: "",
+                        password: "",
+                        status: false,
+                        order: false
                     },
+                usersOrder: [
+                    {
+                        username: "star",
+                        totalPrice: 155,
+                        totalQty: 4,
+                        order: true
+                    },
+                    {
+                        username: "star1",
+                        totalPrice: 155,
+                        totalQty: 4,
+                        order: false
+                    },
+                    {
+                        username: "name2",
+                        totalPrice: 155,
+                        totalQty: 4,
+                        order: false
+                    },
+                    {
+                        username: "name3",
+                        totalPrice: 155,
+                        totalQty: 4,
+                        order: false
+                    },
+
+                ],
                 items: [
                     {
                         name: "Первое блюдо",
@@ -298,7 +375,15 @@
         color: $color-white;
     }
 
-    #user-name {
+    .auth-error {
+        width: 300px;
+        display: block;
+        margin: 40vh auto;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .user-name {
         width: 100%;
         height: 100%;
         display: block;
